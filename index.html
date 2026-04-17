@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HomeOverview Tabletpaneel</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="dashboard">
+      <nav class="dashboard-nav" aria-label="Overzichten">
+        <a class="nav-button active" href="index.html" aria-label="Dashboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5-1.28 1.54L18 11.61V20h-5v-6h-2v6H6v-8.39l-1.72 1.43L3 11.5Z"/></svg>
+          Dashboard
+        </a>
+        <a class="nav-button" href="webcams.html" aria-label="Alle webcams">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h10a3 3 0 0 1 3 3v1.4l3.45-2.3A1 1 0 0 1 22 7.93v8.14a1 1 0 0 1-1.55.83L17 14.6V16a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Z"/></svg>
+          Webcams
+        </a>
+        <a class="nav-button" href="verwarming.html" aria-label="Alle verwarmingstoestellen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.76V5a4 4 0 0 0-8 0v9.76A6 6 0 1 0 14 14.76ZM10 21a4 4 0 0 1-2.67-6.98L8 13.42V5a2 2 0 1 1 4 0v8.42l.67.6A4 4 0 0 1 10 21Z"/></svg>
+          Verwarming
+        </a>
+        <a class="nav-button" href="schakelaars.html" aria-label="Alle Qnect schakelaars">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2h2v10h-2V2Zm6.78 3.81-1.42 1.42A7 7 0 1 1 7.64 7.23L6.22 5.81a9 9 0 1 0 11.56 0Z"/></svg>
+          Qnect
+        </a>
+        <a class="nav-button" href="rolluiken.html" aria-label="Alle rolluiken">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2H5V4Zm1 4h12v12H6V8Zm2 2v2h8v-2H8Zm0 4v2h8v-2H8Z"/></svg>
+          Rolluiken
+        </a>
+      </nav>
+      <header class="topbar">
+        <section class="status-block" aria-label="Vandaag">
+          <div class="day" id="current-day">Vandaag</div>
+          <div class="date-line" id="current-date">--</div>
+        </section>
+        <section class="temperature-block" aria-label="Huidige temperatuur">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 14.76V5a4 4 0 0 0-8 0v9.76A6 6 0 1 0 14 14.76ZM10 21a4 4 0 0 1-2.67-6.98L8 13.42V5a2 2 0 1 1 4 0v8.42l.67.6A4 4 0 0 1 10 21Z"/>
+          </svg>
+          <div>
+            <div class="temperature" id="current-temperature">--&deg;C</div>
+            <div class="temperature-source" id="temperature-source">Buiten</div>
+          </div>
+        </section>
+        <section class="status-block align-right" aria-label="Tijd">
+          <div class="time" id="current-time">--:--</div>
+          <div class="date-line">Tabletpaneel</div>
+        </section>
+      </header>
+
+      <section class="content-grid">
+        <section class="panel climate-panel" aria-labelledby="daikin-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Daikin</p>
+              <h1 id="daikin-title">Klimaat</h1>
+            </div>
+            <button class="icon-button active" type="button" data-action="toggle-climate" aria-label="Daikin aan of uit">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 2h2v10h-2V2Zm6.78 3.81-1.42 1.42A7 7 0 1 1 7.64 7.23L6.22 5.81a9 9 0 1 0 11.56 0Z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="climate-readout">
+            <button class="round-button" type="button" data-action="temp-down" aria-label="Temperatuur lager">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v2H5v-2Z"/></svg>
+            </button>
+            <div class="target-temp">
+              <span id="target-temperature">21.0</span><small>&deg;C</small>
+            </div>
+            <button class="round-button" type="button" data-action="temp-up" aria-label="Temperatuur hoger">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5Z"/></svg>
+            </button>
+          </div>
+
+          <div class="segmented-control" role="group" aria-label="Daikin modus">
+            <button class="selected" type="button" data-mode="heat">Warm</button>
+            <button type="button" data-mode="cool">Koel</button>
+            <button type="button" data-mode="auto">Auto</button>
+            <button type="button" data-mode="dry">Droog</button>
+          </div>
+
+          <div class="mini-stats">
+            <span>Binnen <strong id="inside-temperature">--&deg;C</strong></span>
+            <span>Ventilator <strong id="fan-speed">Auto</strong></span>
+          </div>
+        </section>
+
+        <section class="panel sonoff-panel" aria-labelledby="sonoff-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Sonoff</p>
+              <h2 id="sonoff-title">Schakelaars</h2>
+            </div>
+          </div>
+          <div class="switch-grid" id="sonoff-switches"></div>
+        </section>
+
+        <section class="panel energy-panel" aria-labelledby="energy-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Engie</p>
+              <h2 id="energy-title">Elektriciteit</h2>
+            </div>
+          </div>
+          <div class="energy-summary">
+            <div>
+              <span class="summary-label">Nu</span>
+              <strong id="energy-current">--</strong>
+            </div>
+            <div>
+              <span class="summary-label">Laagste</span>
+              <strong id="energy-min">--</strong>
+            </div>
+            <div>
+              <span class="summary-label">Hoogste</span>
+              <strong id="energy-max">--</strong>
+            </div>
+          </div>
+          <div class="energy-chart-wrap">
+            <svg id="energy-chart" class="energy-chart" viewBox="0 0 640 220" role="img" aria-labelledby="energy-chart-title">
+              <title id="energy-chart-title">Elektriciteitsprijzen vandaag</title>
+              <g id="energy-grid"></g>
+              <g id="energy-bars"></g>
+              <g id="energy-labels"></g>
+            </svg>
+            <div class="energy-tooltip" id="energy-tooltip" role="status" aria-live="polite"></div>
+          </div>
+          <div class="energy-legend" aria-label="Legende elektriciteitskleuren">
+            <span><i class="legend-swatch regular"></i>Normaal</span>
+            <span><i class="legend-swatch low"></i>Goedkoop</span>
+            <span><i class="legend-swatch current"></i>Nu</span>
+          </div>
+          <div class="energy-footer">
+            <span id="energy-date">Vandaag</span>
+            <span id="energy-status">Dagfile laden...</span>
+          </div>
+        </section>
+
+        <section class="panel cameras-panel" aria-labelledby="cameras-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Webcams</p>
+              <h2 id="cameras-title">Live overzicht</h2>
+            </div>
+          </div>
+          <div class="camera-grid" id="camera-grid"></div>
+        </section>
+      </section>
+    </main>
+
+    <dialog class="login-dialog" id="camera-login-dialog">
+      <form method="dialog" id="camera-login-form">
+        <div class="dialog-heading">
+          <h2>Foscam login</h2>
+          <button class="icon-button" type="button" id="camera-login-close" aria-label="Sluiten">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z"/></svg>
+          </button>
+        </div>
+        <label>
+          <span>Gebruiker</span>
+          <input id="camera-username" name="username" type="text" autocomplete="username">
+        </label>
+        <label>
+          <span>Wachtwoord</span>
+          <input id="camera-password" name="password" type="password" autocomplete="current-password">
+        </label>
+        <button class="primary-button" type="submit">Bewaren</button>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+# Runtime logs
+*.log
+*.err
+
+# Local environment and secrets
+.env
+.env.*
+secrets.*
+config.local.*
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Dependency/build folders, if added later
+node_modules/
+dist/
+build/
+vendor/
+
