@@ -22,6 +22,7 @@ Overzichtspagina's:
 - `http://127.0.0.1:8123/verwarming.html`
 - `http://127.0.0.1:8123/schakelaars.html`
 - `http://127.0.0.1:8123/rolluiken.html`
+- `http://127.0.0.1:8123/beheer.html`
 
 Tablet op hetzelfde netwerk:
 
@@ -67,6 +68,8 @@ Pas in `app.js` deze waarden aan:
 - Tik op de Foscam-tegel in het dashboard om de lokale camera-login in de browser van de tablet te bewaren.
 - De Foscam-login wordt niet in de broncode gezet; de tablet bewaart die in `localStorage`.
 - Controleer het laatste cijfer van het IP-adres: een adres dat eindigt op `.0` is meestal geen camera-host.
+- Gebruik `beheer.html` om weerlocatie, Engie-bron, Foscam-host, camera's, Qnect-schakelaars, verwarming en rolluiken lokaal aan te passen.
+- Beheerinstellingen worden in `localStorage` van de browser bewaard. Per tablet/browser kunnen de waarden dus verschillen.
 
 Let op: als de browser de Engie-data blokkeert door CORS, gebruik `energy-proxy.php` via PHP of host dit dashboard op `www.digisteps.be`.
 

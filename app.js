@@ -1,3 +1,5 @@
+const settingsStorageKey = "homeoverview.settings";
+
 const foscamCamera = {
   host: "192.168.129.0",
   port: 88,
@@ -52,6 +54,8 @@ const config = {
     { id: "cam-4", name: "Camera 4", url: "" },
   ],
 };
+
+applySavedSettings();
 
 const state = {
   targetTemperature: 21,
@@ -117,6 +121,139 @@ function saveCameraCredentials(camera, credentials) {
   } catch (error) {
     console.warn("Camera credentials could not be saved locally.", error);
   }
+}
+
+function readDashboardSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(settingsStorageKey) || "{}");
+  } catch (error) {
+    console.warn("Dashboard settings could not be read.", error);
+    return {};
+  }
+}
+
+function saveDashboardSettings(settings) {
+  localStorage.setItem(settingsStorageKey, JSON.stringify(settings));
+}
+
+function applySavedSettings() {
+  const settings = readDashboardSettings();
+
+  if (settings.weather) {
+    config.weather.latitude = readNumber(settings.weather.latitude, config.weather.latitude);
+    config.weather.longitude = readNumber(settings.weather.longitude, config.weather.longitude);
+    config.weather.label = readText(settings.weather.label, config.weather.label);
+  }
+
+  if (settings.energy) {
+    config.energy.baseUrl = readText(settings.energy.baseUrl, config.energy.baseUrl);
+  }
+
+  if (settings.foscamCamera) {
+    foscamCamera.host = readText(settings.foscamCamera.host, foscamCamera.host);
+    foscamCamera.port = readNumber(settings.foscamCamera.port, foscamCamera.port);
+  }
+
+  replaceCollection(config.qnectSwitches, settings.qnectSwitches, normalizeSwitch);
+  replaceCollection(config.heatingDevices, settings.heatingDevices, normalizeHeatingDevice);
+  replaceCollection(config.shutters, settings.shutters, normalizeShutter);
+
+  if (Array.isArray(settings.cameras)) {
+    const cameras = settings.cameras
+      .map(normalizeCamera)
+      .filter((camera) => camera.id && camera.name);
+
+    if (cameras.length) {
+      config.cameras.length = 0;
+      cameras.forEach((camera) => {
+        if (camera.id === "foscam") {
+          config.cameras.push({
+            ...camera,
+            source: foscamCamera,
+            url: buildFoscamStreamUrl(foscamCamera),
+          });
+          return;
+        }
+
+        config.cameras.push(camera);
+      });
+    }
+  }
+}
+
+function replaceCollection(target, items, normalizeItem) {
+  if (!Array.isArray(items)) {
+    return;
+  }
+
+  const normalized = items.map(normalizeItem).filter((item) => item.id && item.name);
+  if (!normalized.length) {
+    return;
+  }
+
+  target.length = 0;
+  target.push(...normalized);
+}
+
+function normalizeSwitch(item) {
+  return {
+    id: readText(item?.id, createId(item?.name || "switch")),
+    name: readText(item?.name, "Schakelaar"),
+    active: Boolean(item?.active),
+  };
+}
+
+function normalizeHeatingDevice(item) {
+  return {
+    id: readText(item?.id, createId(item?.name || "heating")),
+    brand: readText(item?.brand, "Verwarming"),
+    name: readText(item?.name, "Toestel"),
+    status: readText(item?.status, "Niet gekoppeld"),
+    mode: readText(item?.mode, "Auto"),
+    target: readNumber(item?.target, 20),
+    inside: readText(item?.inside, "--"),
+  };
+}
+
+function normalizeShutter(item) {
+  return {
+    id: readText(item?.id, createId(item?.name || "shutter")),
+    name: readText(item?.name, "Rolluik"),
+    position: readText(item?.position, "--"),
+    status: readText(item?.status, "Niet gekoppeld"),
+  };
+}
+
+function normalizeCamera(item) {
+  return {
+    id: readText(item?.id, createId(item?.name || "camera")),
+    name: readText(item?.name, "Camera"),
+    type: readText(item?.type, "iframe"),
+    url: readText(item?.url, ""),
+    status: readText(item?.status, "Niet ingesteld"),
+  };
+}
+
+function readText(value, fallback) {
+  if (typeof value !== "string") {
+    return fallback;
+  }
+
+  const text = value.trim();
+  return text || fallback;
+}
+
+function readNumber(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function createId(value) {
+  const base = String(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return base || `item-${Date.now()}`;
 }
 
 function updateClock() {
@@ -739,11 +876,300 @@ function bindCameraLoginDialog() {
   });
 }
 
+function renderSettingsAdmin(message = "") {
+  const form = document.querySelector("#settings-form");
+  if (!form) {
+    return;
+  }
+
+  form.innerHTML = `
+    <div class="settings-toolbar">
+      <div>
+        <p class="eyebrow">Beheer</p>
+        <h1 id="settings-title">Instellingen</h1>
+      </div>
+      <div class="settings-actions">
+        <button class="secondary-button" type="button" data-action="reset-settings">Standaardwaarden</button>
+        <button class="primary-button compact" type="submit">Opslaan</button>
+      </div>
+    </div>
+    <p class="settings-message${message ? " visible" : ""}" id="settings-message">${escapeHtml(message)}</p>
+    <div class="settings-grid">
+      <aside class="settings-menu" aria-label="Instellingen menu">
+        <a href="#settings-general">Algemeen</a>
+        <a href="#settings-cameras">Camera's</a>
+        <a href="#settings-switches">Qnect</a>
+        <a href="#settings-heating">Verwarming</a>
+        <a href="#settings-shutters">Rolluiken</a>
+      </aside>
+      <div class="settings-content">
+        ${renderGeneralSettings()}
+        ${renderCameraSettings()}
+        ${renderCollectionSettings("settings-switches", "Qnect", "Schakelaars", "qnectSwitches", config.qnectSwitches, [
+          { field: "id", label: "ID" },
+          { field: "name", label: "Naam" },
+          { field: "active", label: "Start actief", type: "checkbox" },
+        ])}
+        ${renderCollectionSettings("settings-heating", "Verwarming", "Toestellen", "heatingDevices", config.heatingDevices, [
+          { field: "id", label: "ID" },
+          { field: "brand", label: "Merk" },
+          { field: "name", label: "Naam" },
+          { field: "status", label: "Status" },
+          { field: "mode", label: "Modus" },
+          { field: "target", label: "Doeltemperatuur", type: "number", step: "0.5" },
+          { field: "inside", label: "Binnentemperatuur" },
+        ])}
+        ${renderCollectionSettings("settings-shutters", "Rolluiken", "Sturingen", "shutters", config.shutters, [
+          { field: "id", label: "ID" },
+          { field: "name", label: "Naam" },
+          { field: "position", label: "Positie" },
+          { field: "status", label: "Status" },
+        ])}
+      </div>
+    </div>
+  `;
+
+  bindSettingsAdmin(form);
+}
+
+function renderGeneralSettings() {
+  return `
+    <section class="settings-section" id="settings-general">
+      <div class="settings-section-heading">
+        <div>
+          <p class="eyebrow">Algemeen</p>
+          <h2>Dashboardbronnen</h2>
+        </div>
+      </div>
+      <div class="settings-fields">
+        ${renderField("Weer latitude", "weather.latitude", config.weather.latitude, { type: "number", step: "0.000001" })}
+        ${renderField("Weer longitude", "weather.longitude", config.weather.longitude, { type: "number", step: "0.000001" })}
+        ${renderField("Weer label", "weather.label", config.weather.label)}
+        ${renderField("Engie basis-URL", "energy.baseUrl", config.energy.baseUrl, { type: "url" })}
+        ${renderField("Foscam IP/host", "foscamCamera.host", foscamCamera.host)}
+        ${renderField("Foscam poort", "foscamCamera.port", foscamCamera.port, { type: "number", step: "1" })}
+      </div>
+    </section>
+  `;
+}
+
+function renderCameraSettings() {
+  return renderCollectionSettings("settings-cameras", "Camera's", "Streams", "cameras", config.cameras, [
+    { field: "id", label: "ID" },
+    { field: "name", label: "Naam" },
+    { field: "type", label: "Type" },
+    { field: "url", label: "URL" },
+    { field: "status", label: "Status" },
+  ], "De Foscam-stream gebruikt de host en poort uit Algemeen. De login blijft apart lokaal bewaard via de camera-login.");
+}
+
+function renderCollectionSettings(id, eyebrow, title, collection, items, fields, hint = "") {
+  return `
+    <section class="settings-section" id="${id}">
+      <div class="settings-section-heading">
+        <div>
+          <p class="eyebrow">${escapeHtml(eyebrow)}</p>
+          <h2>${escapeHtml(title)}</h2>
+        </div>
+        <button class="secondary-button" type="button" data-action="add-row" data-collection="${collection}">Toevoegen</button>
+      </div>
+      ${hint ? `<p class="settings-hint">${escapeHtml(hint)}</p>` : ""}
+      <div class="settings-list" data-list="${collection}">
+        ${items.map((item) => renderSettingsRow(collection, item, fields)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderSettingsRow(collection, item, fields) {
+  return `
+    <article class="settings-row" data-collection="${collection}">
+      <div class="settings-row-header">
+        <strong>${escapeHtml(item.name || item.id || "Nieuw item")}</strong>
+        <button class="danger-button" type="button" data-action="remove-row">Verwijder</button>
+      </div>
+      <div class="settings-fields compact-fields">
+        ${fields.map((field) => renderRowField(item, field)).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderField(label, setting, value, options = {}) {
+  return `
+    <label class="settings-field">
+      <span>${escapeHtml(label)}</span>
+      <input
+        type="${escapeHtml(options.type || "text")}"
+        data-setting="${escapeHtml(setting)}"
+        value="${escapeHtml(String(value ?? ""))}"
+        ${options.step ? `step="${escapeHtml(options.step)}"` : ""}
+      >
+    </label>
+  `;
+}
+
+function renderRowField(item, field) {
+  const value = item[field.field] ?? "";
+  if (field.type === "checkbox") {
+    return `
+      <label class="settings-field checkbox-field">
+        <input type="checkbox" data-field="${escapeHtml(field.field)}" ${value ? "checked" : ""}>
+        <span>${escapeHtml(field.label)}</span>
+      </label>
+    `;
+  }
+
+  return `
+    <label class="settings-field">
+      <span>${escapeHtml(field.label)}</span>
+      <input
+        type="${escapeHtml(field.type || "text")}"
+        data-field="${escapeHtml(field.field)}"
+        value="${escapeHtml(String(value))}"
+        ${field.step ? `step="${escapeHtml(field.step)}"` : ""}
+      >
+    </label>
+  `;
+}
+
+function bindSettingsAdmin(form) {
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const settings = collectDashboardSettings(form);
+    saveDashboardSettings(settings);
+    applySavedSettings();
+    renderSettingsAdmin("Instellingen bewaard. Open het dashboard opnieuw om alles meteen te zien.");
+  });
+
+  form.querySelector("[data-action='reset-settings']").addEventListener("click", () => {
+    localStorage.removeItem(settingsStorageKey);
+    window.location.reload();
+  });
+
+  form.querySelectorAll("[data-action='add-row']").forEach((button) => {
+    button.addEventListener("click", () => {
+      addSettingsRow(button.dataset.collection);
+    });
+  });
+
+  form.querySelectorAll("[data-action='remove-row']").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.closest(".settings-row")?.remove();
+    });
+  });
+}
+
+function addSettingsRow(collection) {
+  const list = document.querySelector(`[data-list='${collection}']`);
+  if (!list) {
+    return;
+  }
+
+  const item = {
+    id: `${collection}-${Date.now()}`,
+    name: "Nieuw item",
+    type: collection === "cameras" ? "iframe" : undefined,
+    url: "",
+    status: "Niet ingesteld",
+    brand: collection === "heatingDevices" ? "Verwarming" : undefined,
+    mode: collection === "heatingDevices" ? "Auto" : undefined,
+    target: collection === "heatingDevices" ? 20 : undefined,
+    inside: collection === "heatingDevices" ? "--" : undefined,
+    position: collection === "shutters" ? "--" : undefined,
+    active: false,
+  };
+  const fields = getSettingsFields(collection);
+  list.insertAdjacentHTML("beforeend", renderSettingsRow(collection, item, fields));
+  const row = list.lastElementChild;
+  row.querySelector("[data-action='remove-row']").addEventListener("click", () => row.remove());
+}
+
+function getSettingsFields(collection) {
+  const fields = {
+    cameras: [
+      { field: "id", label: "ID" },
+      { field: "name", label: "Naam" },
+      { field: "type", label: "Type" },
+      { field: "url", label: "URL" },
+      { field: "status", label: "Status" },
+    ],
+    qnectSwitches: [
+      { field: "id", label: "ID" },
+      { field: "name", label: "Naam" },
+      { field: "active", label: "Start actief", type: "checkbox" },
+    ],
+    heatingDevices: [
+      { field: "id", label: "ID" },
+      { field: "brand", label: "Merk" },
+      { field: "name", label: "Naam" },
+      { field: "status", label: "Status" },
+      { field: "mode", label: "Modus" },
+      { field: "target", label: "Doeltemperatuur", type: "number", step: "0.5" },
+      { field: "inside", label: "Binnentemperatuur" },
+    ],
+    shutters: [
+      { field: "id", label: "ID" },
+      { field: "name", label: "Naam" },
+      { field: "position", label: "Positie" },
+      { field: "status", label: "Status" },
+    ],
+  };
+  return fields[collection] || [];
+}
+
+function collectDashboardSettings(form) {
+  return {
+    weather: {
+      latitude: getSettingValue(form, "weather.latitude"),
+      longitude: getSettingValue(form, "weather.longitude"),
+      label: getSettingValue(form, "weather.label"),
+    },
+    energy: {
+      baseUrl: getSettingValue(form, "energy.baseUrl"),
+    },
+    foscamCamera: {
+      host: getSettingValue(form, "foscamCamera.host"),
+      port: getSettingValue(form, "foscamCamera.port"),
+    },
+    cameras: collectSettingsRows(form, "cameras"),
+    qnectSwitches: collectSettingsRows(form, "qnectSwitches"),
+    heatingDevices: collectSettingsRows(form, "heatingDevices"),
+    shutters: collectSettingsRows(form, "shutters"),
+  };
+}
+
+function getSettingValue(form, setting) {
+  return form.querySelector(`[data-setting='${setting}']`)?.value.trim() || "";
+}
+
+function collectSettingsRows(form, collection) {
+  return [...form.querySelectorAll(`[data-collection='${collection}']`)]
+    .map((row) => {
+      const item = {};
+      row.querySelectorAll("[data-field]").forEach((input) => {
+        item[input.dataset.field] = input.type === "checkbox" ? input.checked : input.value.trim();
+      });
+      return item;
+    })
+    .filter((item) => item.id || item.name);
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 if (document.querySelector("#current-day")) {
   updateClock();
   setInterval(updateClock, 30_000);
 }
 
+renderSettingsAdmin();
 renderSonoffSwitches();
 renderCameras();
 renderWebcamOverview();

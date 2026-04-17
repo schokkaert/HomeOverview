@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Qnect schakelaars | HomeOverview</title>
+    <title>Beheer | HomeOverview</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <main class="dashboard overview-dashboard">
+    <main class="dashboard overview-dashboard settings-dashboard">
       <nav class="dashboard-nav" aria-label="Overzichten">
         <a class="nav-button" href="index.html" aria-label="Dashboard">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5-1.28 1.54L18 11.61V20h-5v-6h-2v6H6v-8.39l-1.72 1.43L3 11.5Z"/></svg>
@@ -21,7 +21,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.76V5a4 4 0 0 0-8 0v9.76A6 6 0 1 0 14 14.76ZM10 21a4 4 0 0 1-2.67-6.98L8 13.42V5a2 2 0 1 1 4 0v8.42l.67.6A4 4 0 0 1 10 21Z"/></svg>
           Verwarming
         </a>
-        <a class="nav-button active" href="schakelaars.html" aria-label="Alle Qnect schakelaars">
+        <a class="nav-button" href="schakelaars.html" aria-label="Alle Qnect schakelaars">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2h2v10h-2V2Zm6.78 3.81-1.42 1.42A7 7 0 1 1 7.64 7.23L6.22 5.81a9 9 0 1 0 11.56 0Z"/></svg>
           Qnect
         </a>
@@ -29,20 +29,14 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2H5V4Zm1 4h12v12H6V8Zm2 2v2h8v-2H8Zm0 4v2h8v-2H8Z"/></svg>
           Rolluiken
         </a>
-        <a class="nav-button" href="beheer.html" aria-label="Beheer instellingen">
+        <a class="nav-button active" href="beheer.html" aria-label="Beheer instellingen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19.43 12.98.04-.98-.04-.98 2.11-1.65-2-3.46-2.49 1a7.33 7.33 0 0 0-1.7-.98L15 3h-4l-.35 2.93c-.61.24-1.18.57-1.7.98l-2.49-1-2 3.46 2.11 1.65-.04.98.04.98-2.11 1.65 2 3.46 2.49-1c.52.41 1.09.74 1.7.98L11 21h4l.35-2.93c.61-.24 1.18-.57 1.7-.98l2.49 1 2-3.46-2.11-1.65ZM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5Z"/></svg>
           Beheer
         </a>
       </nav>
 
-      <section class="panel overview-panel">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">Qnect</p>
-            <h1>Alle schakelaars</h1>
-          </div>
-        </div>
-        <div class="overview-grid switch-overview-grid" id="switch-overview-grid"></div>
+      <section class="panel settings-panel" aria-labelledby="settings-title">
+        <form id="settings-form"></form>
       </section>
     </main>
 

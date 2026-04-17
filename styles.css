@@ -779,6 +779,192 @@ h2 {
   font-weight: 800;
 }
 
+.settings-dashboard {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.settings-panel {
+  padding: 0;
+}
+
+#settings-form {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.settings-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.primary-button.compact,
+.secondary-button,
+.danger-button {
+  min-height: 42px;
+  border-radius: 7px;
+  padding: 9px 13px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.secondary-button {
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: var(--surface-strong);
+}
+
+.danger-button {
+  border: 1px solid rgb(237 111 101 / 45%);
+  color: #ffd5d0;
+  background: rgb(237 111 101 / 13%);
+}
+
+.settings-message {
+  display: none;
+  margin: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgb(86 197 150 / 28%);
+  color: var(--accent);
+  background: rgb(86 197 150 / 10%);
+  font-weight: 750;
+}
+
+.settings-message.visible {
+  display: block;
+}
+
+.settings-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+}
+
+.settings-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-right: 1px solid var(--line);
+  background: rgb(17 24 23 / 58%);
+}
+
+.settings-menu a {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 10px 12px;
+  color: var(--text);
+  background: rgb(34 48 45 / 72%);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.settings-content {
+  min-height: 0;
+  overflow: auto;
+  padding: 14px;
+}
+
+.settings-section {
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgb(17 24 23 / 58%);
+  overflow: hidden;
+}
+
+.settings-section-heading,
+.settings-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-section-heading {
+  padding: 13px;
+  border-bottom: 1px solid var(--line);
+}
+
+.settings-hint {
+  margin: 0;
+  padding: 10px 13px 0;
+  color: var(--muted);
+}
+
+.settings-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 13px;
+}
+
+.compact-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0;
+}
+
+.settings-field {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.settings-field input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px 11px;
+  color: var(--text);
+  background: #101817;
+  font: inherit;
+}
+
+.checkbox-field {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  align-self: end;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 11px;
+  background: #101817;
+}
+
+.checkbox-field input {
+  width: 20px;
+  min-height: 20px;
+}
+
+.settings-list {
+  display: grid;
+  gap: 10px;
+  padding: 13px;
+}
+
+.settings-row {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--surface);
+}
+
 @media (max-width: 940px) {
   body {
     overflow: auto;
@@ -822,6 +1008,25 @@ h2 {
   .shutter-overview-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .settings-content {
+    overflow: visible;
+  }
+
+  .compact-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 620px) {
@@ -859,7 +1064,25 @@ h2 {
   .switch-grid,
   .camera-grid,
   .overview-grid,
-  .shutter-overview-grid {
+  .shutter-overview-grid,
+  .settings-fields,
+  .compact-fields {
     grid-template-columns: 1fr;
+  }
+
+  .settings-toolbar,
+  .settings-section-heading,
+  .settings-row-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-actions {
+    justify-content: stretch;
+  }
+
+  .settings-actions button,
+  .settings-section-heading button {
+    width: 100%;
   }
 }
