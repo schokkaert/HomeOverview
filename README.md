@@ -22,6 +22,7 @@ Overzichtspagina's:
 - `http://127.0.0.1:8123/verwarming.html`
 - `http://127.0.0.1:8123/schakelaars.html`
 - `http://127.0.0.1:8123/rolluiken.html`
+- `http://127.0.0.1:8123/planten.html`
 - `http://127.0.0.1:8123/beheer.html`
 
 Tablet op hetzelfde netwerk:
@@ -49,6 +50,7 @@ Het dashboard blijft op poort `8123`; Home Assistant gebruikt hostpoort `8124` e
 - Daikin-bediening als dashboardpaneel.
 - Sonoff-schakelaars als dashboardpaneel.
 - Webcam-overzicht met configureerbare camera-URL's.
+- Plantbewatering via `http://192.168.1.238/`, bedoeld voor wifi-netwerk `Schokkaer_EXT`.
 - Kleine Engie/elektriciteitsgrafiek op basis van de dagfile van vandaag.
 - Als de dagfile van morgen al beschikbaar is, toont de grafiek vandaag en morgen samen.
 - Per datum probeert de grafiek eerst `downloads.php?action=sonoff_json&date=YYYY-MM-DD` te laden.
@@ -68,7 +70,7 @@ Pas in `app.js` deze waarden aan:
 - Tik op de Foscam-tegel in het dashboard om de lokale camera-login in de browser van de tablet te bewaren.
 - De Foscam-login wordt niet in de broncode gezet; de tablet bewaart die in `localStorage`.
 - Controleer het laatste cijfer van het IP-adres: een adres dat eindigt op `.0` is meestal geen camera-host.
-- Gebruik `beheer.html` om weerlocatie, Engie-bron, Foscam-host, camera's, Qnect-schakelaars, verwarming en rolluiken lokaal aan te passen.
+- Gebruik `beheer.html` om weerlocatie, Engie-bron, plantensysteem, Foscam-host, camera's, Qnect-schakelaars, verwarming en rolluiken lokaal aan te passen.
 - Beheerinstellingen worden in `localStorage` van de browser bewaard. Per tablet/browser kunnen de waarden dus verschillen.
 
 Let op: als de browser de Engie-data blokkeert door CORS, gebruik `energy-proxy.php` via PHP of host dit dashboard op `www.digisteps.be`.

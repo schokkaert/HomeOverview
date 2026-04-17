@@ -35,6 +35,11 @@ const config = {
   energy: {
     baseUrl: "https://www.digisteps.be/engie/",
   },
+  plants: {
+    url: "http://192.168.1.238/",
+    ssid: "Schokkaer_EXT",
+    label: "Plantbewatering",
+  },
   sonoffSwitches: qnectSwitches,
   qnectSwitches,
   heatingDevices,
@@ -147,6 +152,12 @@ function applySavedSettings() {
 
   if (settings.energy) {
     config.energy.baseUrl = readText(settings.energy.baseUrl, config.energy.baseUrl);
+  }
+
+  if (settings.plants) {
+    config.plants.url = readText(settings.plants.url, config.plants.url);
+    config.plants.ssid = readText(settings.plants.ssid, config.plants.ssid);
+    config.plants.label = readText(settings.plants.label, config.plants.label);
   }
 
   if (settings.foscamCamera) {
@@ -876,6 +887,37 @@ function bindCameraLoginDialog() {
   });
 }
 
+function renderPlantSystemPage() {
+  const container = document.querySelector("#plants-panel");
+  if (!container) {
+    return;
+  }
+
+  const url = config.plants.url;
+  const ssid = config.plants.ssid;
+  const label = config.plants.label;
+  container.innerHTML = `
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Planten</p>
+        <h1>${escapeHtml(label)}</h1>
+      </div>
+      <a class="primary-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">Open systeem</a>
+    </div>
+    <div class="plants-layout">
+      <article class="plants-info">
+        <h2>Watergeefsysteem</h2>
+        <p>Dit systeem staat op <strong>${escapeHtml(url)}</strong>.</p>
+        <p>Bereikbaar wanneer deze tablet of pc verbonden is met wifi-netwerk <strong>${escapeHtml(ssid)}</strong>.</p>
+        <p>Als het venster hieronder leeg blijft, open het systeem via de knop. Sommige toestellen blokkeren weergave binnen een dashboard.</p>
+      </article>
+      <div class="plants-frame-wrap">
+        <iframe title="${escapeHtml(label)}" src="${escapeHtml(url)}" loading="lazy"></iframe>
+      </div>
+    </div>
+  `;
+}
+
 function renderSettingsAdmin(message = "") {
   const form = document.querySelector("#settings-form");
   if (!form) {
@@ -897,6 +939,7 @@ function renderSettingsAdmin(message = "") {
     <div class="settings-grid">
       <aside class="settings-menu" aria-label="Instellingen menu">
         <a href="#settings-general">Algemeen</a>
+        <a href="#settings-plants">Planten</a>
         <a href="#settings-cameras">Camera's</a>
         <a href="#settings-switches">Qnect</a>
         <a href="#settings-heating">Verwarming</a>
@@ -904,6 +947,7 @@ function renderSettingsAdmin(message = "") {
       </aside>
       <div class="settings-content">
         ${renderGeneralSettings()}
+        ${renderPlantSettings()}
         ${renderCameraSettings()}
         ${renderCollectionSettings("settings-switches", "Qnect", "Schakelaars", "qnectSwitches", config.qnectSwitches, [
           { field: "id", label: "ID" },
@@ -948,6 +992,25 @@ function renderGeneralSettings() {
         ${renderField("Engie basis-URL", "energy.baseUrl", config.energy.baseUrl, { type: "url" })}
         ${renderField("Foscam IP/host", "foscamCamera.host", foscamCamera.host)}
         ${renderField("Foscam poort", "foscamCamera.port", foscamCamera.port, { type: "number", step: "1" })}
+      </div>
+    </section>
+  `;
+}
+
+function renderPlantSettings() {
+  return `
+    <section class="settings-section" id="settings-plants">
+      <div class="settings-section-heading">
+        <div>
+          <p class="eyebrow">Planten</p>
+          <h2>Watergeefsysteem</h2>
+        </div>
+      </div>
+      <p class="settings-hint">Dit systeem is alleen bereikbaar wanneer de tablet of pc verbonden is met het juiste wifi-netwerk.</p>
+      <div class="settings-fields">
+        ${renderField("Plantensysteem URL", "plants.url", config.plants.url, { type: "url" })}
+        ${renderField("Vereist wifi-netwerk", "plants.ssid", config.plants.ssid)}
+        ${renderField("Naam in dashboard", "plants.label", config.plants.label)}
       </div>
     </section>
   `;
@@ -1128,6 +1191,11 @@ function collectDashboardSettings(form) {
     energy: {
       baseUrl: getSettingValue(form, "energy.baseUrl"),
     },
+    plants: {
+      url: getSettingValue(form, "plants.url"),
+      ssid: getSettingValue(form, "plants.ssid"),
+      label: getSettingValue(form, "plants.label"),
+    },
     foscamCamera: {
       host: getSettingValue(form, "foscamCamera.host"),
       port: getSettingValue(form, "foscamCamera.port"),
@@ -1176,6 +1244,7 @@ renderWebcamOverview();
 renderHeatingOverview();
 renderSwitchOverview();
 renderShutterOverview();
+renderPlantSystemPage();
 bindClimateControls();
 bindCameraLoginDialog();
 
