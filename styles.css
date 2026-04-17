@@ -783,14 +783,31 @@ h2 {
   grid-template-rows: auto minmax(0, 1fr);
 }
 
+.settings-page {
+  overflow-y: auto;
+}
+
+.settings-page .dashboard {
+  height: auto;
+  min-height: 100dvh;
+}
+
 .settings-panel {
   padding: 0;
+}
+
+.settings-page .settings-panel {
+  overflow: visible;
 }
 
 #settings-form {
   min-height: 0;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.settings-page #settings-form {
+  display: block;
 }
 
 .settings-toolbar {
@@ -851,6 +868,10 @@ h2 {
   grid-template-columns: 210px minmax(0, 1fr);
 }
 
+.settings-page .settings-grid {
+  min-height: auto;
+}
+
 .settings-menu {
   display: flex;
   flex-direction: column;
@@ -874,6 +895,10 @@ h2 {
   min-height: 0;
   overflow: auto;
   padding: 14px;
+}
+
+.settings-page .settings-content {
+  overflow: visible;
 }
 
 .settings-section {
