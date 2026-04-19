@@ -773,6 +773,25 @@ function renderCameraStream(camera) {
   return `<div class="camera-view"><iframe title="${camera.name}" src="${camera.url}" loading="lazy"></iframe></div>`;
 }
 
+function getCameraStatus(camera) {
+  const text = camera.url ? "Live" : camera.status || "Geen beeld";
+  return {
+    text,
+    isOnline: Boolean(camera.url) || /^online\b/i.test(text),
+    hasStream: Boolean(camera.url),
+  };
+}
+
+function renderCameraDetailPlaceholder(camera) {
+  return `
+    <div class="camera-detail-empty">
+      ${iconCamera}
+      <strong>${escapeHtml(camera.source ? "Login nodig voor beeld" : "Geen beeld ingesteld")}</strong>
+      ${camera.source ? `<button class="secondary-button compact" type="button" data-action="camera-login">Login</button>` : ""}
+    </div>
+  `;
+}
+
 function renderCameraDetailPage() {
   const container = document.querySelector("#camera-detail-panel");
   if (!container) {
@@ -803,8 +822,10 @@ function renderCameraDetailPage() {
 
   const stream = camera.url
     ? renderCameraStream(camera)
-    : `<div class="camera-view camera-detail-view">${iconCamera}</div>`;
-  const statusText = camera.url ? "Live" : camera.status || "Geen beeld";
+    : renderCameraDetailPlaceholder(camera);
+  const status = getCameraStatus(camera);
+  const streamText = camera.url ? "Live" : camera.source ? "Login nodig" : "Niet ingesteld";
+  const cameraAddress = camera.source ? `${camera.source.host}:${camera.source.port}` : getUrlHost(camera.url || "");
 
   container.innerHTML = `
     <div class="panel-heading camera-detail-heading">
@@ -825,8 +846,16 @@ function renderCameraDetailPage() {
       <aside class="camera-detail-info">
         <dl>
           <div>
-            <dt>Status</dt>
-            <dd><span class="camera-status-dot ${camera.url ? "online" : "offline"}"></span>${escapeHtml(statusText)}</dd>
+            <dt>Apparaat</dt>
+            <dd><span class="camera-status-dot ${status.isOnline ? "online" : "offline"}"></span>${escapeHtml(status.text)}</dd>
+          </div>
+          <div>
+            <dt>Beeld</dt>
+            <dd><span class="camera-status-dot ${status.hasStream ? "online" : "offline"}"></span>${escapeHtml(streamText)}</dd>
+          </div>
+          <div>
+            <dt>Adres</dt>
+            <dd>${escapeHtml(cameraAddress || "Niet ingesteld")}</dd>
           </div>
           <div>
             <dt>ID</dt>
@@ -838,17 +867,19 @@ function renderCameraDetailPage() {
           </div>
           <div>
             <dt>URL</dt>
-            <dd>${escapeHtml(camera.url || camera.status || "Niet ingesteld")}</dd>
+            <dd>${escapeHtml(camera.url || "Geen stream-URL zonder login")}</dd>
           </div>
         </dl>
       </aside>
     </div>
   `;
 
-  container.querySelector("[data-action='camera-login']")?.addEventListener("click", () => {
-    if (camera.source) {
-      openCameraLoginDialog(camera.source);
-    }
+  container.querySelectorAll("[data-action='camera-login']").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (camera.source) {
+        openCameraLoginDialog(camera.source);
+      }
+    });
   });
 }
 
@@ -1482,13 +1513,12 @@ function renderCameraSettingsRow(item, fields) {
 }
 
 function renderCameraStatusDot(camera) {
-  const statusText = camera.url ? "Preview actief" : camera.status || "Geen beeld";
-  const isOnline = Boolean(camera.url) || /^online\b/i.test(statusText);
+  const status = getCameraStatus(camera);
   return `
     <span
-      class="camera-status-dot ${isOnline ? "online" : "offline"}"
-      title="${escapeHtml(statusText)}"
-      aria-label="${escapeHtml(statusText)}"
+      class="camera-status-dot ${status.isOnline ? "online" : "offline"}"
+      title="${escapeHtml(status.text)}"
+      aria-label="${escapeHtml(status.text)}"
     ></span>
   `;
 }

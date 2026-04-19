@@ -1529,10 +1529,22 @@ h2 {
 .camera-detail-empty {
   min-height: 360px;
   display: grid;
+  gap: 14px;
   place-items: center;
+  align-content: center;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #111817;
+}
+
+.camera-detail-empty .camera-placeholder {
+  width: 54px;
+  height: 54px;
+}
+
+.camera-detail-empty strong {
+  color: var(--text);
+  font-size: 1rem;
 }
 
 @media (max-width: 940px) {
