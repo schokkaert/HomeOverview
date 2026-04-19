@@ -1331,24 +1331,44 @@ h2 {
   align-items: center;
 }
 
-.camera-settings-preview strong,
-.camera-settings-preview span {
-  display: block;
+.camera-settings-meta {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
 }
 
-.camera-settings-preview strong {
+.camera-settings-meta strong,
+.camera-settings-meta span:not(.camera-status-dot) {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.camera-settings-meta strong {
   color: var(--text);
 }
 
-.camera-settings-preview span {
+.camera-settings-meta span:not(.camera-status-dot) {
   margin-top: 4px;
   color: var(--muted);
   font-size: .88rem;
   font-weight: 700;
+}
+
+.camera-status-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: var(--danger);
+  box-shadow: 0 0 0 3px rgb(237 111 101 / 14%);
+}
+
+.camera-status-dot.online {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgb(86 197 150 / 16%);
 }
 
 .camera-settings-thumb {
@@ -1381,12 +1401,7 @@ h2 {
 .camera-settings-fields {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns:
-    minmax(96px, .72fr)
-    minmax(130px, .95fr)
-    minmax(82px, .55fr)
-    minmax(230px, 1.75fr)
-    minmax(150px, 1fr);
+  grid-template-columns: minmax(100px, .8fr) minmax(150px, 1fr) minmax(90px, .55fr) minmax(320px, 2fr);
   gap: 10px;
 }
 

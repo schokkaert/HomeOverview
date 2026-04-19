@@ -1285,7 +1285,6 @@ function renderCameraSettings() {
     { field: "name", label: "Naam" },
     { field: "type", label: "Type" },
     { field: "url", label: "URL" },
-    { field: "status", label: "Status" },
   ];
 
   return `
@@ -1346,16 +1345,32 @@ function renderCameraSettingsRow(item, fields) {
     <article class="settings-row camera-settings-row" data-collection="cameras">
       <div class="camera-settings-preview">
         ${renderCameraSettingsPreview(camera)}
-        <div>
-          <strong>${escapeHtml(item.name || item.id || "Camera")}</strong>
-          <span>${escapeHtml(camera.url ? "Preview actief" : item.status || "Geen beeld")}</span>
+        <div class="camera-settings-meta">
+          ${renderCameraStatusDot(camera)}
+          <div>
+            <strong>${escapeHtml(item.name || item.id || "Camera")}</strong>
+            <span>${escapeHtml(camera.url || item.status || "Geen beeld")}</span>
+          </div>
         </div>
       </div>
       <button class="danger-button" type="button" data-action="remove-row">Verwijder</button>
       <div class="camera-settings-fields">
         ${fields.map((field) => renderRowField(item, field)).join("")}
       </div>
+      <input type="hidden" data-field="status" value="${escapeHtml(item.status || "")}">
     </article>
+  `;
+}
+
+function renderCameraStatusDot(camera) {
+  const statusText = camera.url ? "Preview actief" : camera.status || "Geen beeld";
+  const isOnline = Boolean(camera.url) || /^online\b/i.test(statusText);
+  return `
+    <span
+      class="camera-status-dot ${isOnline ? "online" : "offline"}"
+      title="${escapeHtml(statusText)}"
+      aria-label="${escapeHtml(statusText)}"
+    ></span>
   `;
 }
 
@@ -1484,7 +1499,6 @@ function getSettingsFields(collection) {
       { field: "name", label: "Naam" },
       { field: "type", label: "Type" },
       { field: "url", label: "URL" },
-      { field: "status", label: "Status" },
     ],
     qnectSwitches: [
       { field: "id", label: "ID" },
