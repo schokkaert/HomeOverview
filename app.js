@@ -51,12 +51,8 @@ const config = {
       type: "mjpeg",
       source: foscamCamera,
       url: buildFoscamStreamUrl(foscamCamera),
-      status: "Tik voor login",
+      status: "Online op 192.168.129.0:88",
     },
-    { id: "qnect-frontdoor", name: "Voordeur Qnect", url: "", status: "Niet ingesteld" },
-    { id: "cam-2", name: "Camera 2", url: "" },
-    { id: "cam-3", name: "Camera 3", url: "" },
-    { id: "cam-4", name: "Camera 4", url: "" },
   ],
 };
 
@@ -173,7 +169,8 @@ function applySavedSettings() {
   if (Array.isArray(settings.cameras)) {
     const cameras = settings.cameras
       .map(normalizeCamera)
-      .filter((camera) => camera.id && camera.name);
+      .filter((camera) => camera.id && camera.name)
+      .filter((camera) => !isLegacyEmptyCamera(camera));
 
     if (cameras.length) {
       config.cameras.length = 0;
@@ -244,6 +241,10 @@ function normalizeCamera(item) {
     url: readText(item?.url, ""),
     status: readText(item?.status, "Niet ingesteld"),
   };
+}
+
+function isLegacyEmptyCamera(camera) {
+  return ["qnect-frontdoor", "cam-2", "cam-3", "cam-4"].includes(camera.id) && !camera.url;
 }
 
 function readText(value, fallback) {
@@ -1279,13 +1280,29 @@ function renderPlantSettings() {
 }
 
 function renderCameraSettings() {
-  return renderCollectionSettings("settings-cameras", "Camera's", "Streams", "cameras", config.cameras, [
+  const fields = [
     { field: "id", label: "ID" },
     { field: "name", label: "Naam" },
     { field: "type", label: "Type" },
     { field: "url", label: "URL" },
     { field: "status", label: "Status" },
-  ], "De Foscam-stream gebruikt de host en poort uit Algemeen. De login blijft apart lokaal bewaard via de camera-login.");
+  ];
+
+  return `
+    <section class="settings-section" id="settings-cameras">
+      <div class="settings-section-heading">
+        <div>
+          <p class="eyebrow">Camera's</p>
+          <h2>Streams</h2>
+        </div>
+        <button class="secondary-button" type="button" data-action="add-row" data-collection="cameras">Toevoegen</button>
+      </div>
+      <p class="settings-hint">Online gevonden: Foscam op 192.168.129.0:88. De Foscam-stream gebruikt de host en poort uit Algemeen. De login blijft apart lokaal bewaard via de camera-login.</p>
+      <div class="settings-list camera-settings-list" data-list="cameras">
+        ${config.cameras.map((item) => renderCameraSettingsRow(item, fields)).join("")}
+      </div>
+    </section>
+  `;
 }
 
 function renderCollectionSettings(id, eyebrow, title, collection, items, fields, hint = "") {
@@ -1316,6 +1333,15 @@ function renderSettingsRow(collection, item, fields) {
       <div class="settings-fields compact-fields">
         ${fields.map((field) => renderRowField(item, field)).join("")}
       </div>
+    </article>
+  `;
+}
+
+function renderCameraSettingsRow(item, fields) {
+  return `
+    <article class="settings-row camera-settings-row" data-collection="cameras">
+      ${fields.map((field) => renderRowField(item, field)).join("")}
+      <button class="danger-button" type="button" data-action="remove-row">Verwijder</button>
     </article>
   `;
 }
@@ -1405,7 +1431,10 @@ function addSettingsRow(collection) {
     active: false,
   };
   const fields = getSettingsFields(collection);
-  list.insertAdjacentHTML("beforeend", renderSettingsRow(collection, item, fields));
+  list.insertAdjacentHTML(
+    "beforeend",
+    collection === "cameras" ? renderCameraSettingsRow(item, fields) : renderSettingsRow(collection, item, fields)
+  );
   const row = list.lastElementChild;
   row.querySelector("[data-action='remove-row']").addEventListener("click", () => row.remove());
 }

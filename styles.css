@@ -1304,6 +1304,31 @@ h2 {
   background: var(--surface);
 }
 
+.camera-settings-list {
+  gap: 8px;
+}
+
+.camera-settings-row {
+  grid-template-columns:
+    minmax(96px, .72fr)
+    minmax(130px, .95fr)
+    minmax(82px, .55fr)
+    minmax(230px, 1.75fr)
+    minmax(150px, 1fr)
+    auto;
+  align-items: end;
+}
+
+.camera-settings-row .settings-field {
+  min-width: 0;
+}
+
+.camera-settings-row .danger-button {
+  align-self: end;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
 @media (max-width: 940px) {
   body {
     overflow: auto;
@@ -1386,6 +1411,10 @@ h2 {
   .compact-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .camera-settings-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 620px) {
@@ -1427,7 +1456,8 @@ h2 {
   .network-infra-row,
   .network-device-grid,
   .settings-fields,
-  .compact-fields {
+  .compact-fields,
+  .camera-settings-row {
     grid-template-columns: 1fr;
   }
 

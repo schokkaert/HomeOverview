@@ -51,6 +51,7 @@ Het dashboard blijft op poort `8123`; Home Assistant gebruikt hostpoort `8124` e
 - Daikin-bediening als dashboardpaneel.
 - Sonoff-schakelaars als dashboardpaneel.
 - Webcam-overzicht met configureerbare camera-URL's.
+- Online camerascan: Foscam op `192.168.129.0:88`.
 - Plantbewatering via `http://192.168.128.238/`, bedoeld voor wifi-netwerk `Schokkaer_EXT`.
 - Visueel netwerkoverzicht via `netwerk.html`, met modem, RE190, LAN, camera's en bekende toestellen.
 - Kleine Engie/elektriciteitsgrafiek op basis van de dagfile van vandaag.
@@ -68,10 +69,9 @@ Pas in `app.js` deze waarden aan:
 - `shutters` bevat Rolluik keuken, Rolluik achteraan en Rolluik zijkant.
 - `cameras.url` voor de stream- of snapshot-URL's van je webcams.
 - De Foscam staat klaar in `foscamCamera` met IP `192.168.129.0` en poort `88`.
-- `Voordeur Qnect` staat klaar als extra webcamtegel.
 - Tik op de Foscam-tegel in het dashboard om de lokale camera-login in de browser van de tablet te bewaren.
 - De Foscam-login wordt niet in de broncode gezet; de tablet bewaart die in `localStorage`.
-- Controleer het laatste cijfer van het IP-adres: een adres dat eindigt op `.0` is meestal geen camera-host.
+- In dit netwerk is `192.168.129.0` geldig, omdat het wifi-subnet `192.168.128.0/23` gebruikt.
 - Gebruik `beheer.html` om weerlocatie, Engie-bron, plantensysteem, Foscam-host, camera's, Qnect-schakelaars, verwarming en rolluiken lokaal aan te passen.
 - Beheerinstellingen worden in `localStorage` van de browser bewaard. Per tablet/browser kunnen de waarden dus verschillen.
 
