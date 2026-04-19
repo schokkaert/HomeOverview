@@ -19,6 +19,7 @@ Open daarna `http://127.0.0.1:8123/index.html`.
 Overzichtspagina's:
 
 - `http://127.0.0.1:8123/webcams.html`
+- `http://127.0.0.1:8123/camera.html?id=foscam`
 - `http://127.0.0.1:8123/verwarming.html`
 - `http://127.0.0.1:8123/schakelaars.html`
 - `http://127.0.0.1:8123/rolluiken.html`
@@ -51,6 +52,7 @@ Het dashboard blijft op poort `8123`; Home Assistant gebruikt hostpoort `8124` e
 - Daikin-bediening als dashboardpaneel.
 - Sonoff-schakelaars als dashboardpaneel.
 - Webcam-overzicht met configureerbare camera-URL's.
+- Per camera een eigen detailpagina via `camera.html?id=CAMERA_ID`.
 - Online camerascan: Foscam op `192.168.129.0:88`.
 - Plantbewatering via `http://192.168.128.238/`, bedoeld voor wifi-netwerk `Schokkaer_EXT`.
 - Visueel netwerkoverzicht via `netwerk.html`, met modem, RE190, LAN, camera's en bekende toestellen.

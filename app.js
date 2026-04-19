@@ -124,6 +124,14 @@ function saveCameraCredentials(camera, credentials) {
   }
 }
 
+function getCameraPageUrl(camera) {
+  return `camera.html?id=${encodeURIComponent(camera.id)}`;
+}
+
+function findCameraById(id) {
+  return config.cameras.find((camera) => camera.id === id) || null;
+}
+
 function readDashboardSettings() {
   try {
     return JSON.parse(localStorage.getItem(settingsStorageKey) || "{}");
@@ -664,6 +672,9 @@ function renderCameras() {
 
     const tile = document.createElement("article");
     tile.className = `camera-tile${camera.url ? "" : " setup"}`;
+    tile.tabIndex = 0;
+    tile.setAttribute("role", "link");
+    tile.setAttribute("aria-label", `${camera.name} openen`);
 
     const stream = camera.url
       ? renderCameraStream(camera)
@@ -676,11 +687,12 @@ function renderCameras() {
         <strong>${camera.name}</strong>
         <span>${statusText}</span>
       </div>
+      <div class="camera-tile-actions">
+        <a class="text-link compact" href="${escapeHtml(getCameraPageUrl(camera))}">Open pagina</a>
+      </div>
     `;
 
-    if (!camera.url && camera.source) {
-      tile.addEventListener("click", () => openCameraLoginDialog(camera.source));
-    }
+    bindCameraTileLink(tile, camera);
 
     container.appendChild(tile);
   });
@@ -700,6 +712,9 @@ function renderWebcamOverview() {
 
     const tile = document.createElement("article");
     tile.className = `overview-card camera-tile${camera.url ? "" : " setup"}`;
+    tile.tabIndex = 0;
+    tile.setAttribute("role", "link");
+    tile.setAttribute("aria-label", `${camera.name} openen`);
     const stream = camera.url
       ? renderCameraStream(camera)
       : `<div class="camera-view overview-camera-view">${iconCamera}</div>`;
@@ -711,13 +726,37 @@ function renderWebcamOverview() {
         <strong>${camera.name}</strong>
         <span>${statusText}</span>
       </div>
+      <div class="camera-tile-actions">
+        <a class="text-link compact" href="${escapeHtml(getCameraPageUrl(camera))}">Open pagina</a>
+      </div>
     `;
 
-    if (!camera.url && camera.source) {
-      tile.addEventListener("click", () => openCameraLoginDialog(camera.source));
-    }
+    bindCameraTileLink(tile, camera);
 
     container.appendChild(tile);
+  });
+}
+
+function bindCameraTileLink(tile, camera) {
+  const openCameraPage = () => {
+    window.location.href = getCameraPageUrl(camera);
+  };
+
+  tile.addEventListener("click", (event) => {
+    if (event.target.closest("a, button")) {
+      return;
+    }
+
+    openCameraPage();
+  });
+
+  tile.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    openCameraPage();
   });
 }
 
@@ -732,6 +771,85 @@ function renderCameraStream(camera) {
   }
 
   return `<div class="camera-view"><iframe title="${camera.name}" src="${camera.url}" loading="lazy"></iframe></div>`;
+}
+
+function renderCameraDetailPage() {
+  const container = document.querySelector("#camera-detail-panel");
+  if (!container) {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const selectedId = params.get("id") || config.cameras[0]?.id || "";
+  const camera = findCameraById(selectedId);
+
+  if (!camera) {
+    container.innerHTML = `
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Camera</p>
+          <h1>Niet gevonden</h1>
+        </div>
+        <a class="text-link" href="webcams.html">Terug</a>
+      </div>
+      <div class="camera-detail-empty">${iconCamera}</div>
+    `;
+    return;
+  }
+
+  if (camera.source) {
+    camera.url = buildFoscamStreamUrl(camera.source);
+  }
+
+  const stream = camera.url
+    ? renderCameraStream(camera)
+    : `<div class="camera-view camera-detail-view">${iconCamera}</div>`;
+  const statusText = camera.url ? "Live" : camera.status || "Geen beeld";
+
+  container.innerHTML = `
+    <div class="panel-heading camera-detail-heading">
+      <div>
+        <p class="eyebrow">Camera</p>
+        <h1>${escapeHtml(camera.name)}</h1>
+      </div>
+      <div class="camera-detail-actions">
+        ${camera.source ? `<button class="secondary-button compact" type="button" data-action="camera-login">Login</button>` : ""}
+        <a class="text-link" href="webcams.html">Alle camera's</a>
+        <a class="primary-link" href="beheer.html#settings-cameras">Beheer</a>
+      </div>
+    </div>
+    <div class="camera-detail-layout">
+      <div class="camera-detail-stage">
+        ${stream}
+      </div>
+      <aside class="camera-detail-info">
+        <dl>
+          <div>
+            <dt>Status</dt>
+            <dd><span class="camera-status-dot ${camera.url ? "online" : "offline"}"></span>${escapeHtml(statusText)}</dd>
+          </div>
+          <div>
+            <dt>ID</dt>
+            <dd>${escapeHtml(camera.id)}</dd>
+          </div>
+          <div>
+            <dt>Type</dt>
+            <dd>${escapeHtml(camera.type || "iframe")}</dd>
+          </div>
+          <div>
+            <dt>URL</dt>
+            <dd>${escapeHtml(camera.url || camera.status || "Niet ingesteld")}</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  `;
+
+  container.querySelector("[data-action='camera-login']")?.addEventListener("click", () => {
+    if (camera.source) {
+      openCameraLoginDialog(camera.source);
+    }
+  });
 }
 
 function bindClimateControls() {
@@ -900,6 +1018,7 @@ function bindCameraLoginDialog() {
     dialog.close();
     renderCameras();
     renderWebcamOverview();
+    renderCameraDetailPage();
   });
 }
 
@@ -1584,6 +1703,7 @@ renderSettingsAdmin();
 renderSonoffSwitches();
 renderCameras();
 renderWebcamOverview();
+renderCameraDetailPage();
 renderHeatingOverview();
 renderSwitchOverview();
 renderShutterOverview();

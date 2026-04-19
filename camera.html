@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Camera | HomeOverview</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="camera-page">
+    <main class="dashboard overview-dashboard">
+      <nav class="dashboard-nav" aria-label="Overzichten">
+        <a class="nav-button" href="index.html" aria-label="Dashboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5-1.28 1.54L18 11.61V20h-5v-6h-2v6H6v-8.39l-1.72 1.43L3 11.5Z"/></svg>
+          Dashboard
+        </a>
+        <a class="nav-button active" href="webcams.html" aria-label="Alle webcams">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h10a3 3 0 0 1 3 3v1.4l3.45-2.3A1 1 0 0 1 22 7.93v8.14a1 1 0 0 1-1.55.83L17 14.6V16a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Z"/></svg>
+          Webcams
+        </a>
+        <a class="nav-button" href="verwarming.html" aria-label="Alle verwarmingstoestellen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.76V5a4 4 0 0 0-8 0v9.76A6 6 0 1 0 14 14.76ZM10 21a4 4 0 0 1-2.67-6.98L8 13.42V5a2 2 0 1 1 4 0v8.42l.67.6A4 4 0 0 1 10 21Z"/></svg>
+          Verwarming
+        </a>
+        <a class="nav-button" href="schakelaars.html" aria-label="Alle Qnect schakelaars">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2h2v10h-2V2Zm6.78 3.81-1.42 1.42A7 7 0 1 1 7.64 7.23L6.22 5.81a9 9 0 1 0 11.56 0Z"/></svg>
+          Qnect
+        </a>
+        <a class="nav-button" href="rolluiken.html" aria-label="Alle rolluiken">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2H5V4Zm1 4h12v12H6V8Zm2 2v2h8v-2H8Zm0 4v2h8v-2H8Z"/></svg>
+          Rolluiken
+        </a>
+        <a class="nav-button" href="planten.html" aria-label="Plantbewatering">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2s7 7.2 7 13a7 7 0 0 1-14 0C5 9.2 12 2 12 2Zm-1 17.9V14H7.8a5 5 0 0 0 3.2 5.9ZM13 20a5 5 0 0 0 4-4.9c0-2.7-2.4-6.3-4-8.3V20Z"/></svg>
+          Planten
+        </a>
+        <a class="nav-button" href="netwerk.html" aria-label="Netwerkoverzicht">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4h2v5h5v6h3v5h-8v-5h3v-4H8v4h3v5H3v-5h3V9h5V4Zm2 13v1h6v-1h-6ZM5 17v1h4v-1H5Zm8-11v3h-2V6h2Z"/></svg>
+          Netwerk
+        </a>
+        <a class="nav-button" href="beheer.html" aria-label="Beheer instellingen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19.43 12.98.04-.98-.04-.98 2.11-1.65-2-3.46-2.49 1a7.33 7.33 0 0 0-1.7-.98L15 3h-4l-.35 2.93c-.61.24-1.18.57-1.7.98l-2.49-1-2 3.46 2.11 1.65-.04.98.04.98-2.11 1.65 2 3.46 2.49-1c.52.41 1.09.74 1.7.98L11 21h4l.35-2.93c.61-.24 1.18-.57 1.7-.98l2.49 1 2-3.46-2.11-1.65ZM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5Z"/></svg>
+          Beheer
+        </a>
+      </nav>
+
+      <section class="panel camera-detail-panel" id="camera-detail-panel"></section>
+    </main>
+
+    <dialog class="login-dialog" id="camera-login-dialog">
+      <form method="dialog" id="camera-login-form">
+        <div class="dialog-heading">
+          <h2>Foscam login</h2>
+          <button class="icon-button" type="button" id="camera-login-close" aria-label="Sluiten">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z"/></svg>
+          </button>
+        </div>
+        <label>
+          <span>Gebruiker</span>
+          <input id="camera-username" name="username" type="text" autocomplete="username">
+        </label>
+        <label>
+          <span>Wachtwoord</span>
+          <input id="camera-password" name="password" type="password" autocomplete="current-password">
+        </label>
+        <button class="primary-button" type="submit">Bewaren</button>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
