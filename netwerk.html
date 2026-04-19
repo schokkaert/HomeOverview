@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Rolluiken | HomeOverview</title>
+    <title>Netwerk | HomeOverview</title>
     <link rel="stylesheet" href="styles.css">
   </head>
-  <body>
+  <body class="network-page">
     <main class="dashboard overview-dashboard">
       <nav class="dashboard-nav" aria-label="Overzichten">
         <a class="nav-button" href="index.html" aria-label="Dashboard">
@@ -25,7 +25,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2h2v10h-2V2Zm6.78 3.81-1.42 1.42A7 7 0 1 1 7.64 7.23L6.22 5.81a9 9 0 1 0 11.56 0Z"/></svg>
           Qnect
         </a>
-        <a class="nav-button active" href="rolluiken.html" aria-label="Alle rolluiken">
+        <a class="nav-button" href="rolluiken.html" aria-label="Alle rolluiken">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2H5V4Zm1 4h12v12H6V8Zm2 2v2h8v-2H8Zm0 4v2h8v-2H8Z"/></svg>
           Rolluiken
         </a>
@@ -33,7 +33,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2s7 7.2 7 13a7 7 0 0 1-14 0C5 9.2 12 2 12 2Zm-1 17.9V14H7.8a5 5 0 0 0 3.2 5.9ZM13 20a5 5 0 0 0 4-4.9c0-2.7-2.4-6.3-4-8.3V20Z"/></svg>
           Planten
         </a>
-        <a class="nav-button" href="netwerk.html" aria-label="Netwerkoverzicht">
+        <a class="nav-button active" href="netwerk.html" aria-label="Netwerkoverzicht">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4h2v5h5v6h3v5h-8v-5h3v-4H8v4h3v5H3v-5h3V9h5V4Zm2 13v1h6v-1h-6ZM5 17v1h4v-1H5Zm8-11v3h-2V6h2Z"/></svg>
           Netwerk
         </a>
@@ -43,15 +43,7 @@
         </a>
       </nav>
 
-      <section class="panel overview-panel">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">Rolluiken</p>
-            <h1>Alle sturingen</h1>
-          </div>
-        </div>
-        <div class="overview-grid shutter-overview-grid" id="shutter-overview-grid"></div>
-      </section>
+      <section class="panel network-panel" id="network-panel" aria-label="Netwerkoverzicht"></section>
     </main>
 
     <script src="app.js"></script>

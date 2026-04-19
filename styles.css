@@ -172,7 +172,7 @@ svg {
   display: grid;
   min-height: 0;
   grid-template-columns: minmax(0, .98fr) minmax(0, 1.02fr);
-  grid-template-rows: minmax(0, .95fr) minmax(0, 1fr);
+  grid-template-rows: minmax(210px, .68fr) minmax(0, 1.32fr);
   grid-template-areas:
     "climate sonoff"
     "energy cameras";
@@ -321,6 +321,9 @@ svg {
 
 .climate-panel {
   grid-area: climate;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
 }
 
 .sonoff-panel {
@@ -345,6 +348,10 @@ svg {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
+}
+
+.climate-panel .panel-heading {
+  margin-bottom: 6px;
 }
 
 .eyebrow {
@@ -379,6 +386,11 @@ h2 {
   border-radius: 8px;
 }
 
+.climate-panel .icon-button {
+  width: 36px;
+  height: 36px;
+}
+
 .icon-button.active {
   background: var(--accent-strong);
   border-color: var(--accent);
@@ -399,20 +411,26 @@ h2 {
 .climate-readout {
   display: grid;
   grid-template-columns: 58px minmax(0, 1fr) 58px;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  margin: 10px 0;
+  margin: 4px 0 8px;
+}
+
+.climate-panel .round-button {
+  width: 46px;
+  height: 46px;
+  justify-self: center;
 }
 
 .target-temp {
-  min-height: 82px;
+  min-height: 62px;
   display: flex;
   align-items: baseline;
   justify-content: center;
   border-radius: 8px;
   background: linear-gradient(135deg, rgb(86 197 150 / 22%), rgb(105 167 255 / 14%));
   border: 1px solid var(--line);
-  font-size: clamp(3.15rem, 5.7vw, 5rem);
+  font-size: clamp(2.5rem, 4.2vw, 3.65rem);
   line-height: 1;
   font-weight: 800;
 }
@@ -434,7 +452,7 @@ h2 {
 }
 
 .segmented-control button {
-  min-height: 38px;
+  min-height: 34px;
   border-radius: 6px;
   color: var(--muted);
   background: transparent;
@@ -451,8 +469,8 @@ h2 {
   display: flex;
   justify-content: space-between;
   gap: 14px;
-  margin-top: 9px;
-  font-size: .92rem;
+  margin-top: 7px;
+  font-size: .86rem;
 }
 
 .mini-stats strong {
@@ -529,6 +547,29 @@ h2 {
   font-weight: 800;
 }
 
+.network-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.network-actions button,
+.network-actions a {
+  min-height: 42px;
+}
+
+.network-actions svg {
+  width: 18px;
+  height: 18px;
+}
+
+.network-actions .secondary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .plants-panel {
   min-height: 0;
   display: flex;
@@ -579,6 +620,207 @@ h2 {
   min-height: 560px;
   border: 0;
   background: #fff;
+}
+
+.network-page {
+  overflow-y: auto;
+}
+
+.network-page .dashboard {
+  height: auto;
+  min-height: 100dvh;
+}
+
+.network-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.network-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 12px;
+}
+
+.network-map {
+  display: grid;
+  grid-template-rows: auto 18px auto 24px auto;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background:
+    linear-gradient(135deg, rgb(86 197 150 / 9%), transparent 45%),
+    #111817;
+}
+
+.network-root {
+  width: min(360px, 100%);
+  justify-self: center;
+}
+
+.network-infra-row,
+.network-device-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.network-infra-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.network-device-grid {
+  align-self: start;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.network-line {
+  justify-self: center;
+  background: rgb(86 197 150 / 42%);
+}
+
+.network-line.vertical {
+  width: 2px;
+  height: 18px;
+}
+
+.network-line.fan {
+  width: min(76%, 640px);
+  height: 2px;
+  position: relative;
+}
+
+.network-line.fan::before,
+.network-line.fan::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 24px;
+  background: rgb(86 197 150 / 42%);
+}
+
+.network-line.fan::before {
+  left: 0;
+}
+
+.network-line.fan::after {
+  right: 0;
+}
+
+.network-node {
+  min-width: 0;
+  min-height: 118px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--surface);
+}
+
+.network-node.gateway {
+  border-color: rgb(86 197 150 / 64%);
+  background: rgb(49 167 122 / 18%);
+}
+
+.network-node.repeater {
+  border-color: rgb(105 167 255 / 62%);
+  background: rgb(105 167 255 / 13%);
+}
+
+.network-node.hub,
+.network-node.lan {
+  background: rgb(34 48 45 / 92%);
+}
+
+.network-node.camera {
+  border-color: rgb(240 179 90 / 56%);
+}
+
+.network-node.plant {
+  border-color: rgb(86 197 150 / 56%);
+}
+
+.network-node.printer {
+  border-color: rgb(105 167 255 / 56%);
+}
+
+.network-node.storage {
+  border-color: rgb(240 179 90 / 56%);
+  background: rgb(240 179 90 / 10%);
+}
+
+.network-node.unknown {
+  border-color: rgb(169 184 177 / 34%);
+  background: rgb(169 184 177 / 8%);
+}
+
+.network-node-top {
+  display: grid;
+  gap: 7px;
+}
+
+.network-type {
+  justify-self: start;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--muted);
+  background: #101817;
+  font-size: .76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.network-node strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+}
+
+.network-node dl,
+.network-details dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.network-node dl div,
+.network-details dl div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.network-node dt,
+.network-details dt {
+  color: var(--muted);
+  font-size: .76rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.network-node dd,
+.network-details dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 750;
+}
+
+.network-details {
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #111817;
+}
+
+.network-details h2 {
+  margin-bottom: 14px;
 }
 
 .energy-summary {
@@ -656,17 +898,17 @@ h2 {
   z-index: 2;
   left: 0;
   top: 0;
-  min-width: 64px;
+  min-width: 104px;
   pointer-events: none;
   transform: translate(-50%, calc(-100% - 10px));
   border: 1px solid var(--line);
   border-radius: 6px;
-  padding: 7px 9px;
+  padding: 8px 10px;
   color: var(--text);
   background: rgb(16 24 23 / 96%);
   box-shadow: 0 10px 24px rgb(0 0 0 / 32%);
   font-size: .84rem;
-  line-height: 1;
+  line-height: 1.15;
   opacity: 0;
   transition: opacity .12s ease;
 }
@@ -677,7 +919,14 @@ h2 {
 
 .energy-tooltip strong {
   display: block;
+  margin-top: 4px;
   font-size: .98rem;
+}
+
+.energy-tooltip span {
+  display: block;
+  color: var(--muted);
+  font-weight: 700;
 }
 
 .energy-axis-label {
@@ -1107,6 +1356,18 @@ h2 {
     min-height: 620px;
   }
 
+  .network-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .network-map {
+    grid-template-rows: auto 16px auto 20px auto;
+  }
+
+  .network-device-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .settings-grid {
     grid-template-columns: 1fr;
   }
@@ -1163,9 +1424,21 @@ h2 {
   .camera-grid,
   .overview-grid,
   .shutter-overview-grid,
+  .network-infra-row,
+  .network-device-grid,
   .settings-fields,
   .compact-fields {
     grid-template-columns: 1fr;
+  }
+
+  .network-line.fan {
+    width: 2px;
+    height: 22px;
+  }
+
+  .network-line.fan::before,
+  .network-line.fan::after {
+    display: none;
   }
 
   .settings-toolbar,

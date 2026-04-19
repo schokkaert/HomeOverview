@@ -36,7 +36,7 @@ const config = {
     baseUrl: "https://www.digisteps.be/engie/",
   },
   plants: {
-    url: "http://192.168.1.238/",
+    url: "http://192.168.128.238/",
     ssid: "Schokkaer_EXT",
     label: "Plantbewatering",
   },
@@ -155,7 +155,8 @@ function applySavedSettings() {
   }
 
   if (settings.plants) {
-    config.plants.url = readText(settings.plants.url, config.plants.url);
+    const plantUrl = readText(settings.plants.url, config.plants.url);
+    config.plants.url = getUrlHost(plantUrl) === "192.168.1.238" ? "http://192.168.128.238/" : plantUrl;
     config.plants.ssid = readText(settings.plants.ssid, config.plants.ssid);
     config.plants.label = readText(settings.plants.label, config.plants.label);
   }
@@ -477,8 +478,22 @@ function formatKwh(value) {
   return `${(value * 100).toFixed(1)} ct`;
 }
 
+function formatEnergyHourRange(time) {
+  const [hourText] = String(time || "").split(":");
+  const hour = Number(hourText);
+  if (!Number.isFinite(hour)) {
+    return time || "--";
+  }
+
+  const nextHour = (hour + 1) % 24;
+  return `${String(hour).padStart(2, "0")}:00-${String(nextHour).padStart(2, "0")}:00`;
+}
+
 function formatEnergyTooltip(item) {
-  return `<strong>${formatKwh(item.kwh)}</strong>`;
+  return `
+    <span>${escapeHtml(formatEnergyHourRange(item.time))}</span>
+    <strong>${formatKwh(item.kwh)}/kWh</strong>
+  `;
 }
 
 function drawEnergyChart(items, min, max, currentDate, currentTime) {
@@ -531,7 +546,7 @@ function drawEnergyChart(items, min, max, currentDate, currentTime) {
       rx: 3,
     });
     const title = createSvg("title", {});
-    title.textContent = `${item.date} ${item.time}: ${formatKwh(item.kwh)}/kWh`;
+    title.textContent = `${item.date} ${formatEnergyHourRange(item.time)}: ${formatKwh(item.kwh)}/kWh`;
     bar.appendChild(title);
     bar.addEventListener("pointermove", (event) => showEnergyTooltip(event, item));
     bar.addEventListener("pointerleave", hideEnergyTooltip);
@@ -918,6 +933,253 @@ function renderPlantSystemPage() {
   `;
 }
 
+function getUrlHost(value) {
+  try {
+    return new URL(value).host;
+  } catch (error) {
+    return value || "--";
+  }
+}
+
+function renderNetworkNode(item) {
+  return `
+    <article class="network-node ${escapeHtml(item.type)}">
+      <div class="network-node-top">
+        <span class="network-type">${escapeHtml(item.typeLabel)}</span>
+        <strong>${escapeHtml(item.name)}</strong>
+      </div>
+      <dl>
+        <div>
+          <dt>IP</dt>
+          <dd>${escapeHtml(item.ip)}</dd>
+        </div>
+        <div>
+          <dt>Info</dt>
+          <dd>${escapeHtml(item.info)}</dd>
+        </div>
+      </dl>
+    </article>
+  `;
+}
+
+function renderNetworkPage() {
+  const container = document.querySelector("#network-panel");
+  if (!container) {
+    return;
+  }
+
+  const modem = {
+    name: "Internet Box",
+    ip: "192.168.128.1",
+    dns: "192.168.128.1",
+    dhcp: "Actief",
+    dhcpRange: "192.168.129.0 - 192.168.129.254",
+    activeSubnet: "255.255.254.0",
+    configuredSubnet: "255.255.252.0",
+    activeRange: "192.168.128.0 - 192.168.129.255",
+    mac: "64:fa:2b:cb:e5:f2",
+    hostname: "mymodem.home",
+  };
+
+  const devices = [
+    {
+      type: "server",
+      typeLabel: "Dashboard",
+      name: "HomeOverview",
+      ip: "192.168.129.3:8123",
+      info: "Deze pc, poort 8123 open",
+    },
+    {
+      type: "server",
+      typeLabel: "VM",
+      name: "Home Assistant",
+      ip: "192.168.129.3:8124",
+      info: "Niet open in scan",
+    },
+    {
+      type: "camera",
+      typeLabel: "Camera",
+      name: "Foscam",
+      ip: `${foscamCamera.host}:${foscamCamera.port}`,
+      info: "Poorten 88 en 443 open",
+    },
+    {
+      type: "media",
+      typeLabel: "TV",
+      name: "Tv in woonkamer",
+      ip: "192.168.128.4",
+      info: "Antwoordt op ping",
+    },
+    {
+      type: "printer",
+      typeLabel: "HP",
+      name: "HP690FC5",
+      ip: "192.168.129.8",
+      info: "Poorten 80, 443, 8080 open",
+    },
+    {
+      type: "storage",
+      typeLabel: "NAS",
+      name: "SchokkaertDrive",
+      ip: "192.168.1.59",
+      info: "Poorten 80, 443, 554, 5000, 5001 open",
+    },
+    {
+      type: "plant",
+      typeLabel: "IoT",
+      name: config.plants.label,
+      ip: getUrlHost(config.plants.url),
+      info: "Niet gevonden in scan",
+    },
+    {
+      type: "unknown",
+      typeLabel: "Onbekend",
+      name: "Host 192.168.128.2",
+      ip: "192.168.128.2",
+      info: "Alleen ARP/DNS",
+    },
+    {
+      type: "unknown",
+      typeLabel: "Onbekend",
+      name: "Host 192.168.129.5",
+      ip: "192.168.129.5",
+      info: "Alleen ARP/DNS",
+    },
+    {
+      type: "unknown",
+      typeLabel: "Onbekend",
+      name: "Host 192.168.129.7",
+      ip: "192.168.129.7",
+      info: "Alleen ARP/DNS",
+    },
+  ];
+
+  container.innerHTML = `
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Netwerk</p>
+        <h1>Visueel overzicht</h1>
+      </div>
+      <div class="network-actions">
+        <button class="secondary-button compact" type="button" data-action="refresh-network">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.45 10.92l-1.85-.77A6 6 0 1 1 16.24 7.76L13 11h8V3l-3.35 3.35Z"/></svg>
+          Ververs
+        </button>
+        <a class="primary-link" href="beheer.html">Beheer</a>
+      </div>
+    </div>
+    <div class="network-layout">
+      <section class="network-map" aria-label="Netwerkschema">
+        <div class="network-root">
+          ${renderNetworkNode({
+            type: "gateway",
+            typeLabel: "Modem",
+            name: modem.name,
+            ip: modem.ip,
+            info: `${modem.hostname}, DNS + gateway`,
+          })}
+        </div>
+        <div class="network-line vertical"></div>
+        <div class="network-infra-row">
+          ${renderNetworkNode({
+            type: "lan",
+            typeLabel: "LAN",
+            name: "Prive netwerk",
+            ip: "192.168.128.0/23",
+            info: "Actief op deze pc",
+          })}
+          ${renderNetworkNode({
+            type: "repeater",
+            typeLabel: "Repeater",
+            name: "WiFiBoosterV2",
+            ip: "192.168.128.3",
+            info: "Gevonden via DNS",
+          })}
+          ${renderNetworkNode({
+            type: "repeater",
+            typeLabel: "RE190",
+            name: "TP-Link RE190",
+            ip: "192.168.128.135",
+            info: "Niet gevonden in scan",
+          })}
+        </div>
+        <div class="network-line fan"></div>
+        <div class="network-device-grid">
+          ${devices.map(renderNetworkNode).join("")}
+        </div>
+      </section>
+      <aside class="network-details" aria-label="Netwerkadressen">
+        <h2>Modem</h2>
+        <dl>
+          <div>
+            <dt>Naam</dt>
+            <dd>${modem.name}</dd>
+          </div>
+          <div>
+            <dt>Hostnaam</dt>
+            <dd>${modem.hostname}</dd>
+          </div>
+          <div>
+            <dt>IP / gateway</dt>
+            <dd>${modem.ip}</dd>
+          </div>
+          <div>
+            <dt>DNS</dt>
+            <dd>${modem.dns}</dd>
+          </div>
+          <div>
+            <dt>MAC</dt>
+            <dd>${modem.mac}</dd>
+          </div>
+          <div>
+            <dt>DHCP</dt>
+            <dd>${modem.dhcp}</dd>
+          </div>
+          <div>
+            <dt>DHCP-pool modem</dt>
+            <dd>${modem.dhcpRange}</dd>
+          </div>
+          <div>
+            <dt>Actief subnet</dt>
+            <dd>${modem.activeSubnet}</dd>
+          </div>
+          <div>
+            <dt>Subnet modemscherm</dt>
+            <dd>${modem.configuredSubnet}</dd>
+          </div>
+          <div>
+            <dt>Actief bereik</dt>
+            <dd>${modem.activeRange}</dd>
+          </div>
+          <div>
+            <dt>Gevonden repeater</dt>
+            <dd>192.168.128.3</dd>
+          </div>
+          <div>
+            <dt>Plantbewatering</dt>
+            <dd>${escapeHtml(getUrlHost(config.plants.url))} niet gevonden</dd>
+          </div>
+          <div>
+            <dt>Oud subnet</dt>
+            <dd>192.168.1.59 SchokkaertDrive</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  `;
+
+  bindNetworkControls();
+}
+
+function bindNetworkControls() {
+  const refresh = document.querySelector("[data-action='refresh-network']");
+  if (!refresh) {
+    return;
+  }
+
+  refresh.addEventListener("click", () => window.location.reload());
+}
+
 function renderSettingsAdmin(message = "") {
   const form = document.querySelector("#settings-form");
   if (!form) {
@@ -1245,6 +1507,7 @@ renderHeatingOverview();
 renderSwitchOverview();
 renderShutterOverview();
 renderPlantSystemPage();
+renderNetworkPage();
 bindClimateControls();
 bindCameraLoginDialog();
 

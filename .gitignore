@@ -1,6 +1,7 @@
 # Runtime logs
 *.log
 *.err
+.chrome-test-profile/
 
 # Local environment and secrets
 .env
@@ -20,4 +21,3 @@ node_modules/
 dist/
 build/
 vendor/
-

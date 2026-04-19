@@ -23,6 +23,7 @@ Overzichtspagina's:
 - `http://127.0.0.1:8123/schakelaars.html`
 - `http://127.0.0.1:8123/rolluiken.html`
 - `http://127.0.0.1:8123/planten.html`
+- `http://127.0.0.1:8123/netwerk.html`
 - `http://127.0.0.1:8123/beheer.html`
 
 Tablet op hetzelfde netwerk:
@@ -50,7 +51,8 @@ Het dashboard blijft op poort `8123`; Home Assistant gebruikt hostpoort `8124` e
 - Daikin-bediening als dashboardpaneel.
 - Sonoff-schakelaars als dashboardpaneel.
 - Webcam-overzicht met configureerbare camera-URL's.
-- Plantbewatering via `http://192.168.1.238/`, bedoeld voor wifi-netwerk `Schokkaer_EXT`.
+- Plantbewatering via `http://192.168.128.238/`, bedoeld voor wifi-netwerk `Schokkaer_EXT`.
+- Visueel netwerkoverzicht via `netwerk.html`, met modem, RE190, LAN, camera's en bekende toestellen.
 - Kleine Engie/elektriciteitsgrafiek op basis van de dagfile van vandaag.
 - Als de dagfile van morgen al beschikbaar is, toont de grafiek vandaag en morgen samen.
 - Per datum probeert de grafiek eerst `downloads.php?action=sonoff_json&date=YYYY-MM-DD` te laden.
