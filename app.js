@@ -1338,11 +1338,49 @@ function renderSettingsRow(collection, item, fields) {
 }
 
 function renderCameraSettingsRow(item, fields) {
+  const camera = item.source
+    ? { ...item, url: buildFoscamStreamUrl(item.source) }
+    : item;
+
   return `
     <article class="settings-row camera-settings-row" data-collection="cameras">
-      ${fields.map((field) => renderRowField(item, field)).join("")}
+      <div class="camera-settings-preview">
+        ${renderCameraSettingsPreview(camera)}
+        <div>
+          <strong>${escapeHtml(item.name || item.id || "Camera")}</strong>
+          <span>${escapeHtml(camera.url ? "Preview actief" : item.status || "Geen beeld")}</span>
+        </div>
+      </div>
       <button class="danger-button" type="button" data-action="remove-row">Verwijder</button>
+      <div class="camera-settings-fields">
+        ${fields.map((field) => renderRowField(item, field)).join("")}
+      </div>
     </article>
+  `;
+}
+
+function renderCameraSettingsPreview(camera) {
+  if (!camera.url) {
+    return `<div class="camera-settings-thumb">${iconCamera}</div>`;
+  }
+
+  const isImageStream = camera.type === "mjpeg"
+    || camera.type === "image"
+    || /\.(jpg|jpeg|png|gif|webp|mjpg|mjpeg)(\?|$)/i.test(camera.url)
+    || /CGIStream\.cgi/i.test(camera.url);
+
+  if (isImageStream) {
+    return `
+      <div class="camera-settings-thumb">
+        <img src="${escapeHtml(camera.url)}" alt="${escapeHtml(camera.name)}">
+      </div>
+    `;
+  }
+
+  return `
+    <div class="camera-settings-thumb">
+      <iframe title="${escapeHtml(camera.name)}" src="${escapeHtml(camera.url)}" loading="lazy"></iframe>
+    </div>
   `;
 }
 

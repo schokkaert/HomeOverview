@@ -1309,14 +1309,8 @@ h2 {
 }
 
 .camera-settings-row {
-  grid-template-columns:
-    minmax(96px, .72fr)
-    minmax(130px, .95fr)
-    minmax(82px, .55fr)
-    minmax(230px, 1.75fr)
-    minmax(150px, 1fr)
-    auto;
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
 }
 
 .camera-settings-row .settings-field {
@@ -1324,9 +1318,76 @@ h2 {
 }
 
 .camera-settings-row .danger-button {
-  align-self: end;
+  align-self: start;
   min-height: 44px;
   white-space: nowrap;
+}
+
+.camera-settings-preview {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.camera-settings-preview strong,
+.camera-settings-preview span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-settings-preview strong {
+  color: var(--text);
+}
+
+.camera-settings-preview span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .88rem;
+  font-weight: 700;
+}
+
+.camera-settings-thumb {
+  width: 132px;
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background:
+    linear-gradient(135deg, rgb(86 197 150 / 16%), transparent 45%),
+    linear-gradient(315deg, rgb(240 179 90 / 15%), transparent 48%),
+    #111817;
+}
+
+.camera-settings-thumb img,
+.camera-settings-thumb iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
+.camera-settings-thumb .camera-placeholder {
+  width: 30px;
+  height: 30px;
+}
+
+.camera-settings-fields {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns:
+    minmax(96px, .72fr)
+    minmax(130px, .95fr)
+    minmax(82px, .55fr)
+    minmax(230px, 1.75fr)
+    minmax(150px, 1fr);
+  gap: 10px;
 }
 
 @media (max-width: 940px) {
@@ -1413,6 +1474,10 @@ h2 {
   }
 
   .camera-settings-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .camera-settings-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1458,6 +1523,18 @@ h2 {
   .settings-fields,
   .compact-fields,
   .camera-settings-row {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-settings-preview {
+    grid-template-columns: 112px minmax(0, 1fr);
+  }
+
+  .camera-settings-thumb {
+    width: 112px;
+  }
+
+  .camera-settings-fields {
     grid-template-columns: 1fr;
   }
 
